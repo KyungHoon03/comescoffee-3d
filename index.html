@@ -84,6 +84,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-
 #sheetSet details{margin-top:12px;font-size:14px}
 #sheetSet summary{cursor:pointer;padding:4px 0}
 #sheetSet details p{margin:6px 0 0;font-size:13px}
+#qr{position:fixed;z-index:5;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:104px;box-sizing:border-box;padding:9px 9px 6px;background:#fff;border-radius:10px;color:#13161C;text-align:center;text-decoration:none;font-size:11.5px;font-weight:600}
+#qr svg{display:block;width:100%;height:auto;margin-bottom:5px}
 #fail{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;text-align:center;padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--ground);font-size:16px;line-height:1.6}
 @media (max-width:640px){
   #card{bottom:auto;top:calc(max(12px,env(safe-area-inset-top,0px)) + 44px);left:50%;transform:translateX(-50%);padding:10px 14px}
@@ -91,6 +93,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-
   #cardText{min-height:0;font-size:13px}
   #readout{font-size:18px}
   .chip{padding:6px 10px;font-size:12px}
+  #qr{width:auto;padding:7px 12px;border-radius:999px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);font-size:12px}
+  #qr svg{display:none}
 }
 </style>
 
@@ -104,6 +108,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-
   <button id="btnSet" class="chip" type="button">설정</button>
 </div>
 <div id="hint" aria-live="polite"></div>
+<a id="qr" href="https://coffeemap.khoon.net/" target="_blank" rel="noopener" aria-label="코메스 커피맵 열기"><svg aria-hidden="true" viewBox="0 0 25 25" class="segno"><path class="qrline" stroke="#13161c" d="M0 0.5h7m1 0h1m3 0h2m4 0h7m-25 1h1m5 0h1m2 0h3m1 0h1m4 0h1m5 0h1m-25 1h1m1 0h3m1 0h1m1 0h3m2 0h1m2 0h1m1 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m1 0h3m1 0h5m1 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h4m1 0h1m1 0h3m1 0h1m-25 1h1m5 0h1m3 0h1m1 0h1m5 0h1m5 0h1m-25 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-15 1h1m1 0h1m-13 1h4m2 0h1m1 0h1m1 0h2m2 0h1m1 0h2m2 0h3m1 0h1m-24 1h3m6 0h4m2 0h1m2 0h1m3 0h1m-23 1h1m2 0h3m2 0h3m2 0h1m1 0h1m1 0h2m-18 1h1m1 0h2m2 0h3m1 0h2m3 0h3m1 0h2m-23 1h4m2 0h5m2 0h2m2 0h2m1 0h1m1 0h3m-24 1h1m1 0h1m3 0h1m4 0h9m3 0h1m-24 1h1m2 0h1m1 0h2m1 0h1m2 0h1m1 0h1m2 0h1m2 0h1m1 0h2m-24 1h1m1 0h1m2 0h1m2 0h1m1 0h1m3 0h3m2 0h2m3 0h1m-23 1h2m1 0h4m2 0h1m1 0h1m2 0h9m-17 1h5m3 0h1m3 0h1m1 0h1m1 0h1m-25 1h7m5 0h3m1 0h1m1 0h1m1 0h1m1 0h3m-25 1h1m5 0h1m2 0h2m1 0h1m2 0h2m3 0h1m2 0h1m-24 1h1m1 0h3m1 0h1m3 0h2m2 0h1m1 0h6m1 0h2m-25 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m3 0h2m1 0h5m-25 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m-24 1h1m5 0h1m1 0h2m1 0h3m3 0h1m2 0h1m1 0h1m-23 1h7m1 0h1m1 0h4m5 0h6"/></svg><span>코메스 커피맵</span></a>
 <div id="dock"></div>
 <section id="card" hidden aria-live="polite">
   <div id="cardStep"></div>
@@ -222,6 +227,15 @@ const texBark=canvasTex(256,512,(g,w,h)=>{
 const texSoft=canvasTex(128,128,(g,w,h)=>{
   const d=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);d.addColorStop(0,'rgba(255,255,255,.9)');d.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=d;g.fillRect(0,0,w,h);
 });
+
+// 코메스 커피맵 심벌 (coffeemap-symbol-reverse.svg, D-057)
+const texBadge=canvasTex(256,256,g=>{
+  g.scale(4,4);g.lineCap='round';
+  g.strokeStyle='#EEF0F3';g.lineWidth=8;g.stroke(new Path2D('M43.32 19.14 A20 20 0 1 0 43.32 44.86'));
+  g.fillStyle='#F0697A';g.beginPath();g.ellipse(52.5,32,6.8,9.2,0,0,6.2832);g.fill();
+  g.strokeStyle='#13161C';g.lineWidth=1.8;g.stroke(new Path2D('M52.5 23.6 C49.6 28.5 55.4 35.5 52.5 40.4'));
+});
+const matBadge=mat(0xffffff,.7,0,{map:texBadge,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});
 
 // ---------- 장면 ----------
 const stage=$('stage');
@@ -367,7 +381,7 @@ function makePerson(c){
   const legGeo=new T.CapsuleGeometry(.09,.4,4,10);
   const legL=add(g,legGeo,mat(c.pants,.8),-.12,.32,0), legR=add(g,legGeo,legL.material,.12,.32,0);
   const torso=add(g,new T.CapsuleGeometry(.26,.36,6,16),cloth,0,1,0);torso.castShadow=true;
-  if(c.apron!==c.cloth){const ap=add(g,new T.CylinderGeometry(.272,.3,.66,22,1,true,-1,2),apron,0,.92,0);ap.material.side=T.DoubleSide}
+  if(c.apron!==c.cloth){const ap=add(g,new T.CylinderGeometry(.272,.3,.66,22,1,true,-1,2),apron,0,.92,0);ap.material.side=T.DoubleSide;add(g,new T.PlaneGeometry(.125,.125),matBadge,.11,1.16,.258).rotation.y=.41}
   const headG=new T.Group();headG.position.set(0,1.56,0);g.add(headG);
   add(headG,new T.SphereGeometry(.25,22,16),skin).castShadow=true;
   const h=add(headG,new T.SphereGeometry(.27,24,14,0,6.3,0,1.5),hair,0,.012,-.01);h.rotation.x=-.5;
